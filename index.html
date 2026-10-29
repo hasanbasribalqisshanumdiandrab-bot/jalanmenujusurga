@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cari Jawaban Soal</title>
+<meta name="theme-color" content="#0d0f14">
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+
+<!-- ======================= LOGIN ======================= -->
+<div id="login">
+  <div style="width:min(900px,100%);position:relative">
+    <div class="lg" id="lg">
+      <div class="shape"></div>
+
+      <div class="form team">
+        <h2>Login</h2>
+        <div class="field">
+          <input id="lgUser" placeholder=" " autocomplete="username" spellcheck="false">
+          <label for="lgUser">Nama Anda (opsional, mis. ARI)</label>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+        </div>
+        <div class="field">
+          <input id="lgPw" type="password" placeholder=" " autocomplete="one-time-code" inputmode="numeric" spellcheck="false">
+          <label for="lgPw">Kode Authenticator dari admin (6 angka)</label>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+        </div>
+        <button class="go" id="btnLogin">Login</button>
+        <div class="msg" id="msgTeam"></div>
+        <div class="note" id="lgDev"></div>
+        <div class="sw">Belum punya kontak admin? <a id="mailAdmin" class="linkbtn" href="#" style="text-decoration:underline">Hubungi admin lewat email</a></div>
+        <div class="sw">Pengelola web?<button class="linkbtn" id="toAdmin" type="button">Masuk sebagai Admin</button></div>
+      </div>
+
+      <div class="info i-team">
+        <h3>Welcome<br>Back!</h3>
+        <p>Cari jawaban soal dari bank soal dalam sekejap. Minta kode Authenticator ke admin setiap login. Sesi aktif maksimal 2 jam, atau sampai admin memutus.</p>
+      </div>
+
+      <div class="form admin">
+        <h2>Admin</h2>
+        <div class="field">
+          <input id="adEmail" type="email" placeholder=" " autocomplete="email" inputmode="email" spellcheck="false">
+          <label for="adEmail">Email admin</label>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        </div>
+        <div class="field">
+          <input id="adPw" type="password" placeholder=" " autocomplete="current-password">
+          <label for="adPw">Password admin</label>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+        </div>
+        <button class="go" id="btnAdmin">Masuk Admin</button>
+        <div class="msg" id="msgAdmin"></div>
+        <div class="sw">Anggota tim?<button class="linkbtn" id="toTeam" type="button">Kembali ke Login</button></div>
+      </div>
+
+      <div class="info i-admin">
+        <h3>Panel<br>Admin</h3>
+        <p>Lihat perangkat yang terhubung, putuskan kapan saja, kelola Authenticator tim, dan terbitkan data ke GitHub.</p>
+      </div>
+    </div>
+    <div class="lgwarn hidden" id="lgWarn">⚠️ Halaman dibuka langsung dari komputer (file://). Pencarian tetap bisa jalan, tetapi tombol “Simpan ke GitHub” di panel Admin hanya berfungsi bila dibuka lewat alamat GitHub Pages.</div>
+  </div>
+</div>
+
+<!-- ======================= APLIKASI ======================= -->
+<div id="app" class="hidden">
+  <header class="top">
+    <div class="in">
+      <div class="brand">
+        <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg></div>
+        <div><b>Cari Jawaban Soal</b><small>Bank soal pelatihan</small></div>
+      </div>
+      <span class="chip" id="status"><span class="dot"></span><span id="statusTxt">Memuat…</span></span>
+      <span class="chip">Masuk: <b id="whoName">—</b></span>
+      <span class="chip">Sesi <span class="timer" id="timer">2:00:00</span></span>
+      <button class="btn btn-sm hidden" id="btnAdminPanel">⚙️ Admin</button>
+      <button class="btn btn-sm" id="btnLogout">Keluar</button>
+    </div>
+    <div class="progress hidden" id="prog"><b id="progBar"></b></div>
+  </header>
+
+  <div class="page">
+    <main class="main">
+      <section class="card">
+        <div class="bd">
+          <div class="sec-t">Soal</div>
+          <textarea id="q" spellcheck="false" placeholder="Tempel 1 atau banyak soal sekaligus — format “Question 1, Question 2 …”, bernomor 1. 2. 3., atau dipisah baris kosong."></textarea>
+          <div class="actions">
+            <button class="btn btn-acc" id="go">🔍 Cari Jawaban</button>
+            <button class="btn" id="clr">Bersihkan</button>
+            <button class="btn" id="pasteBtn">📋 Tempel &amp; Cari</button>
+            <button class="btn" id="imgBtn">🖼️ Soal dari Gambar</button>
+            <input type="file" id="imgFile" accept="image/jpeg,image/png,image/webp" hidden>
+            <span class="sp"></span>
+          </div>
+          <div class="hint">Hasil muncul otomatis saat mengetik. <kbd>Ctrl</kbd>+<kbd>Enter</kbd> atau tombol Cari menampilkan pop-up ringkasan jawaban. Gambar dibaca dulu ke kotak ini — periksa/koreksi lalu cari ulang bila perlu.</div>
+          <div class="hint" id="ocrNote"></div>
+          <label class="hint" style="display:flex;gap:8px;align-items:flex-start;cursor:pointer"><input type="checkbox" id="autoPaste" style="margin-top:3px"><span><b>Auto-tempel</b>: otomatis tempel &amp; cari dari clipboard saat kotak soal diketuk (kosong) atau saat kembali ke halaman ini. Berlaku di HP dan PC; browser akan meminta izin “tempel” sekali.</span></label>
+          <div class="hint" id="pasteNote"></div>
+        </div>
+      </section>
+      <section id="out"></section>
+    </main>
+
+    <aside class="side">
+      <section class="card">
+        <div class="hd">Bank soal</div>
+        <div class="bd">
+          <div class="stat">
+            <div><small>Total soal</small><b id="srcN">—</b></div>
+            <div><small>Tambahan di perangkat ini</small><b id="srcLocal">0</b></div>
+          </div>
+          <div class="srcline">Sumber: <span id="srcName">—</span><br>Dibangun: <span id="srcDate">—</span></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="hd">Tambah soal dari Excel</div>
+        <div class="bd">
+          <div class="drop" id="drop">Tarik file ke sini atau <u>klik untuk memilih</u><br><small>XLSX · XLS · XLSM · XLSB · CSV · ODS · ZIP</small></div>
+          <input type="file" id="file" accept=".xlsx,.xls,.xlsm,.xlsb,.csv,.ods,.zip" multiple hidden>
+          <div class="hint">Semua sheet dibaca. Soal baru langsung bisa dicari. Tersimpan di perangkat ini; admin dapat menerbitkannya ke semua pengguna.</div>
+          <div class="rep" id="rep"></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="hd">Referensi AI <button class="btn btn-sm" id="aiBtn">Pengaturan</button></div>
+        <div class="bd"><div class="hint" style="margin:0">Dipakai bila soal tidak ada di bank soal, dan untuk membaca gambar. Memakai API key Anda sendiri (Gemini/Claude) yang disimpan di perangkat ini. Status: <b id="aiState">belum aktif</b></div></div>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<!-- ======================= POP-UP HASIL ======================= -->
+<div class="ov" id="ov"><div class="pop" id="pop">
+  <div class="ico" id="popIco"></div><h2 id="popTxt"></h2>
+  <div class="pa hidden" id="popAns"></div><p id="popSub"></p>
+  <button id="popOk">OK</button>
+</div></div>
+
+<!-- ======================= PENGATURAN AI ======================= -->
+<div class="ov" id="ovAi"><div class="modal sm">
+  <div class="mh"><h3>🤖 Referensi AI</h3><button class="btn btn-sm" id="aiClose">Tutup</button></div>
+  <div class="mb">
+    <div class="note" id="aiNote"></div>
+    <div id="aiMsg"></div>
+    <div class="hint" style="margin:6px 0">AI membaca kutipan dari bank soal, menyimpulkan jawaban (dengan huruf a/b/c…), dan bila data tidak ada boleh memakai referensi luar. Kunci hanya dikirim ke penyedia AI.</div>
+    <label class="lab" for="aiProv">Penyedia</label>
+    <select class="inp" id="aiProv"><option value="gemini">Google Gemini</option><option value="claude">Anthropic Claude</option></select>
+    <label class="lab" for="aiKey">API key</label>
+    <input class="inp" id="aiKey" type="password" autocomplete="off" placeholder="Tempel API key">
+    <label class="lab" for="aiModel">Model (opsional)</label>
+    <input class="inp" id="aiModel" placeholder="gemini-2.5-flash">
+    <div class="actions" id="aiAdminRow"><button class="btn btn-acc" id="aiSaveAll">Simpan &amp; sinkronkan ke semua</button><button class="btn btn-danger" id="aiOffAll">Hapus AI bersama</button></div>
+    <div class="actions"><button class="btn" id="aiSave">Simpan hanya di perangkat ini</button><button class="btn" id="aiOff">Hapus kunci perangkat</button></div>
+  </div>
+</div></div>
+
+<!-- ======================= PANEL ADMIN ======================= -->
+<!-- ======================= GERBANG PASSWORD ADMIN ======================= -->
+<div class="ov" id="ovGate"><div class="modal sm">
+  <div class="mh"><h3>🔐 Password Admin</h3><button class="btn btn-sm" id="gateClose">Batal</button></div>
+  <div class="mb">
+    <div class="note">Untuk membuka pengaturan admin, masukkan password admin. Akun: <b id="gateEmail">—</b></div>
+    <label class="lab" for="gatePw">Password admin</label>
+    <input class="inp" id="gatePw" type="password" autocomplete="current-password">
+    <div class="msg" id="gateMsg"></div>
+    <div class="actions"><button class="btn btn-acc" id="gateGo">Buka Panel Admin</button></div>
+  </div>
+</div></div>
+
+<!-- ======================= KODE AUTHENTICATOR SAAT LOGIN ======================= -->
+<div class="ov" id="ovTotp"><div class="modal sm">
+  <div class="mh"><h3>🔢 Kode Authenticator</h3><button class="btn btn-sm" id="totpCancel">Batal</button></div>
+  <div class="mb">
+    <div class="note">Buka <b>Google Authenticator</b>, lalu masukkan kode 6 angka untuk <b>Cari Jawaban Soal</b>.</div>
+    <input class="inp" id="totpCode" inputmode="numeric" maxlength="7" autocomplete="one-time-code" placeholder="123456">
+    <div class="msg" id="totpMsg"></div>
+    <div class="actions"><button class="btn btn-acc" id="totpGo">Masuk</button></div>
+  </div>
+</div></div>
+
+<div class="ov" id="ovAdmin"><div class="modal">
+  <div class="mh"><h3>⚙️ Panel Admin</h3><button class="btn btn-sm" id="adClose">Tutup</button></div>
+  <div class="mb">
+    <div id="syncState" class="alert warn"></div>
+    <div id="pubMsg"></div>
+    <div class="tabs">
+      <button class="tab on" data-tab="dev">Perangkat</button>
+      <button class="tab" data-tab="tm">Authenticator tim</button>
+      <button class="tab" data-tab="tot">Authenticator admin</button>
+      <button class="tab" data-tab="me">Password admin</button>
+      <button class="tab" data-tab="pub">Terbitkan ke GitHub</button>
+    </div>
+
+    <div id="tab-dev">
+      <div class="note">Daftar HP/PC anggota tim yang login. Klik <b>Putuskan</b> kapan saja: perangkat itu keluar otomatis (±45 detik) dan tidak bisa login lagi sampai Anda klik <b>Izinkan lagi</b>. Setiap login anggota tim tetap meminta kode dari Anda, maksimal 2 jam.</div>
+      <div id="devList" class="hidden">
+        <div class="actions" style="align-items:center"><b id="devCount">—</b><button class="btn btn-sm" id="devRefresh">Segarkan</button><button class="btn btn-sm btn-danger" id="devCutAll">Putuskan semua yang online</button></div>
+        <div style="overflow-x:auto"><table class="tbl" id="devTbl"></table></div>
+      </div>
+      <div class="actions"><button class="btn btn-sm" id="devCfgOpen" data-open="0">⚙️ Pengaturan Pusat Perangkat</button></div>
+      <div id="devSetup" class="hidden">
+        <div class="alert warn">Daftar perangkat butuh <b>Pusat Perangkat</b> (skrip Apps Script gratis, sekali pasang). 1) Buka script.google.com → Proyek baru → tempel isi <code>tools/Code.gs</code> (tombol di bawah) dan ganti <code>ADMIN_KEY</code> dengan kunci rahasia Anda. 2) <b>Deploy → Web app</b>: Execute as <b>Me</b>, Who has access <b>Anyone</b>. 3) Salin alamat Web app ke kolom di bawah, isi kunci yang sama, lalu simpan.</div>
+        <div class="actions"><button class="btn btn-sm" id="regCopy">Salin Code.gs</button></div>
+        <label class="lab" for="regUrl">Alamat Web app (https://script.google.com/…/exec)</label><input class="inp" id="regUrl" placeholder="https://script.google.com/macros/s/…/exec">
+        <label class="lab" for="regKey">Kunci admin (sama dengan ADMIN_KEY)</label><input class="inp" id="regKey" type="password" autocomplete="off" placeholder="kunci rahasia">
+        <label class="hint" style="display:flex;gap:8px;align-items:flex-start;cursor:pointer;margin:8px 0"><input type="checkbox" id="regRemember" style="margin-top:3px"><span>Ingat kunci di perangkat ini (hanya perangkat pribadi)</span></label>
+        <div class="actions"><button class="btn btn-acc" id="regSave">Simpan &amp; hubungkan</button></div>
+      </div>
+    </div>
+
+    <div id="tab-tm" class="hidden">
+      <div class="note">Authenticator tim = satu Authenticator milik admin yang tertanam di web ini. Anggota tim (mis. Ari) <b>tidak perlu password</b>: cukup minta kode 6 angka ke admin setiap login. Pindai QR ke Google Authenticator Anda (admin lain boleh memindai QR yang sama).</div>
+      <div id="tmState" class="alert warn"></div>
+      <div id="tmOn" class="hidden">
+        <div class="alert ok" style="text-align:center">Kode saat ini: <b id="tmLive" style="font-size:26px;letter-spacing:3px">––– –––</b> <small>(berganti dalam <span id="tmLeft">30</span> dtk)</small><div class="actions" style="justify-content:center"><button class="btn btn-sm" id="tmCopy">Salin kode</button></div></div>
+        <details><summary style="cursor:pointer;color:var(--acc2);font-weight:600">Tampilkan QR (admin lain / HP baru)</summary>
+          <div id="tmQr" style="width:240px;max-width:100%;background:#fff;padding:8px;border-radius:12px;margin:10px 0"></div>
+          <div class="note">Kunci manual (berbasis waktu): <b id="tmKey" style="letter-spacing:1px;user-select:all"></b></div>
+        </details>
+      </div>
+      <div class="actions"><button class="btn btn-acc" id="tmStart">Buat Authenticator tim</button></div>
+      <div id="tmSetup" class="hidden">
+        <div class="note">1) Google Authenticator → <b>+</b> → <b>Pindai kode QR</b>. 2) Pindai QR ini. 3) Ketik kode 6 angka yang muncul lalu konfirmasi.</div>
+        <div id="tmQrNew" style="width:240px;max-width:100%;background:#fff;padding:8px;border-radius:12px;margin:10px 0"></div>
+        <div class="note">Kunci manual: <b id="tmKeyNew" style="letter-spacing:1px;user-select:all"></b></div>
+        <input class="inp" id="tmCodeIn" inputmode="numeric" maxlength="7" autocomplete="one-time-code" placeholder="123456">
+        <div class="actions"><button class="btn btn-acc" id="tmConfirm">Konfirmasi &amp; aktifkan</button></div>
+      </div>
+    </div>
+
+    <div id="tab-tot" class="hidden">
+      <div class="note">Hubungkan <b>Google Authenticator</b> ke akun admin yang sedang masuk. Setelah terhubung, login admin meminta <b>kode 6 angka</b> setelah password. Ini lapisan tambahan di layar login; kekuatan utama tetap pada password admin yang panjang.</div>
+      <div id="totpState" class="alert warn"></div>
+      <div class="actions"><button class="btn btn-acc" id="totpStart">Hubungkan Google Authenticator</button></div>
+      <div id="totpSetup" class="hidden">
+        <div class="note">1) Buka Google Authenticator → tombol <b>+</b> → <b>Pindai kode QR</b>. 2) Pindai QR di bawah. 3) Ketik kode 6 angka yang muncul lalu konfirmasi.</div>
+        <div id="totpQr" style="width:240px;max-width:100%;background:#fff;padding:8px;border-radius:12px;margin:10px 0"></div>
+        <div class="note">Tidak bisa memindai? Ketik kunci manual (jenis: berbasis waktu): <b id="totpKey" style="letter-spacing:1px;user-select:all"></b></div>
+        <label class="lab" for="totpCodeIn">Kode 6 angka dari aplikasi</label>
+        <input class="inp" id="totpCodeIn" inputmode="numeric" maxlength="7" autocomplete="one-time-code" placeholder="123456">
+        <div class="actions"><button class="btn btn-acc" id="totpConfirm">Konfirmasi &amp; aktifkan</button></div>
+      </div>
+      <div id="totpOff" class="hidden"><div class="actions"><button class="btn btn-danger" id="totpOffBtn">Matikan Authenticator saya</button></div></div>
+      <details style="margin-top:14px"><summary style="cursor:pointer;color:var(--acc2);font-weight:600">Admin lain kehilangan HP?</summary>
+        <div class="note">Matikan Authenticator semua admin lain supaya mereka bisa masuk dengan password lalu menghubungkan ulang.</div>
+        <div class="actions"><button class="btn btn-danger" id="totpResetOthers">Reset Authenticator admin lain</button></div>
+      </details>
+    </div>
+
+    <div id="tab-me" class="hidden">
+      <div class="note">Mengganti password admin untuk email yang sedang masuk: <b id="meEmail">—</b>. Admin lain tidak terpengaruh.</div>
+      <label class="lab" for="mePw">Password admin baru</label>
+      <input class="inp" id="mePw" type="text" placeholder="minimal 8 karakter">
+      <div class="actions"><button class="btn btn-acc" id="mePwSave">Ganti password admin</button></div>
+      <div class="sec-t" style="margin-top:18px">Tambah / ubah admin lain</div>
+      <div class="grid2">
+        <div><label class="lab" for="admNewEmail">Email admin</label><input class="inp" id="admNewEmail" type="email" placeholder="admin@gmail.com"></div>
+        <div><label class="lab" for="admNewPw">Password admin</label><input class="inp" id="admNewPw" type="text" placeholder="minimal 8 karakter"></div>
+      </div>
+      <div class="actions"><button class="btn btn-acc" id="admAdd">Simpan admin</button></div>
+    </div>
+
+    <div id="tab-pub" class="hidden">
+      <div class="alert warn">Isi <b>token pribadi</b> GitHub sekali (hanya disimpan di tab ini, hilang saat tab ditutup). Setelah itu setiap perubahan akun, kode pengguna, atau admin <b>langsung tersimpan &amp; berlaku</b> — pengguna membaca data akun terbaru langsung dari GitHub, tanpa menunggu deploy. Tombol “Terbitkan akun &amp; password” dipakai untuk menyimpan pertama kali.</div>
+      <div class="grid2">
+        <div><label class="lab" for="ghOwner">Pemilik (username GitHub)</label><input class="inp" id="ghOwner"></div>
+        <div><label class="lab" for="ghRepo">Nama repo</label><input class="inp" id="ghRepo"></div>
+        <div><label class="lab" for="ghBranch">Branch</label><input class="inp" id="ghBranch" value="main"></div>
+        <div><label class="lab" for="ghToken">Token (Contents: Read &amp; write)</label><input class="inp" id="ghToken" type="password" autocomplete="off" placeholder="github_pat_…"></div>
+      </div>
+      <label class="hint" style="display:flex;gap:8px;align-items:flex-start;cursor:pointer;margin:8px 0"><input type="checkbox" id="ghRemember" style="margin-top:3px"><span>Ingat token di perangkat ini (hanya untuk PC/HP pribadi Anda, jangan di perangkat bersama)</span></label>
+      <div class="actions">
+        <button class="btn btn-acc" id="pubKeys">Terbitkan pengaturan (sekaligus tes token)</button>
+        <button class="btn btn-acc" id="pubBank">Terbitkan data soal</button>
+      </div>
+      <div class="actions">
+        <button class="btn" id="dlKeys">⬇︎ Unduh keys.js</button>
+        <button class="btn" id="dlBank">⬇︎ Unduh bank.js</button>
+      </div>
+      <details style="margin-top:14px"><summary style="cursor:pointer;color:var(--acc2);font-weight:600">Rotasi penuh — cabut akses semua password lama</summary>
+        <div class="note">Membuat kunci data baru dan mengenkripsi ulang seluruh bank soal. Isi satu password admin baru. Authenticator tim juga diganti (semua perangkat tim keluar). Gunakan bila kunci/password lama bocor.</div>
+                <label class="lab" for="rotEmails">Email admin (pisahkan dengan koma)</label><input class="inp" id="rotEmails" placeholder="a@gmail.com, b@gmail.com">
+        <label class="lab" for="rotAdmin">Password admin baru (berlaku untuk semua email di atas)</label><input class="inp" id="rotAdmin" type="text" placeholder="minimal 8 karakter">
+        <div class="actions"><button class="btn btn-danger" id="rotGo">Rotasi &amp; terbitkan</button></div>
+      </details>
+    </div>
+  </div>
+</div></div>
+
+<script src="assets/vendor/xlsx.full.min.js"></script>
+<script src="assets/vendor/fflate.js"></script>
+<script src="assets/vendor/qrcode.js"></script>
+<script src="assets/crypto.js"></script>
+<script src="assets/importer.js"></script>
+<script src="data/keys.js"></script>
+<script src="data/bank.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
